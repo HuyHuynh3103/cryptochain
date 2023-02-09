@@ -25,9 +25,21 @@ class Blockchain {
             const { timestamp, lastHash, hash, data } = block;
             if (lastHash !== actualLastHash) return false;
             const validatedHash = cryptoHash(timestamp, lastHash, data);
-            if(hash !== validatedHash) return false;
+            if (hash !== validatedHash) return false;
         }
         return true;
+    }
+    replaceChain(chain) {
+        if (chain.length <= this.chain.length) {
+            console.error('The incoming chain must be longer');
+            return;
+        }
+        if (!Blockchain.isValidChain(chain)) {
+            console.error('The incoming chain must be valid')
+            return
+        }
+        console.log('Replacement success')
+        this.chain = chain;
     }
 }
 
