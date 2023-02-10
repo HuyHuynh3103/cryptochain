@@ -6,6 +6,12 @@ const app = express();
 // initialize the blockchain
 const blockchain = new Blockchain();
 
+// config the environment
+if(process.env.NODE_ENV !== 'production'){
+    require('dotenv').config();
+}
+
+
 // use middlewares 
 app.use(bodyParser.json())
 
@@ -20,5 +26,7 @@ app.post('/api/mine', (req, res) => {
 });
 
 // start the server
-const PORT = 3000;
-app.listen(PORT, () => console.log(`Listening at localhost:${PORT} ...`));
+const PORT = process.env.PORT || 3000;
+const HOSTNAME = process.env.HOSTNAME || 'localhost';
+
+app.listen(PORT, () => console.log(`Listening at ${HOSTNAME}:${PORT} ...`));
