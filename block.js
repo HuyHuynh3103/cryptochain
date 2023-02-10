@@ -14,24 +14,25 @@ class Block {
         return new this(GENESIS_DATA);
     }
     static mineBlock({ lastBlock, data }) {
-        let hash, timestamp;
         const lastHash = lastBlock.hash;
-        const difficulty = lastBlock.difficulty;
+        let hash, timestamp;
+        let { difficulty } = lastBlock;
         let nonce = 0; // to be able to adjust
 
         do {
             nonce++;
             timestamp = Date.now();
+            difficulty = Block.adjustDifficulty({ originalBlock: lastBlock, timestamp });
             hash = cryptoHash(timestamp, lastHash, data, nonce, difficulty)
         } while (hash.substring(0, difficulty) !== '0'.repeat(difficulty))
 
         return new this({ timestamp, lastHash, hash, data, nonce, difficulty });
     }
-    static adjustDifficulty({originalBlock, timestamp}){
-        const {difficulty} = originalBlock;
+    static adjustDifficulty({ originalBlock, timestamp }) {
+        const { difficulty } = originalBlock;
         const difference = timestamp - originalBlock.timestamp;
-        if(difference > MINE_RATE) return difficulty - 1;
-        return difficulty - 1;
+        if (difference > MINE_RATE) return difficulty - 1;
+        return difficulty + 1;
     }
 }
 module.exports = Block;
