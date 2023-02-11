@@ -15,9 +15,6 @@ const pubsub = new PubSub({ blockchain });
 
 const ROOT_NODE_ADDRESS = `http://${HOSTNAME}:${DEFAULT_PORT}`;
 
-
-setTimeout(() => pubsub.broadcastChain(), 1000);
-
 // config the environment
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
@@ -44,6 +41,7 @@ const syncChain = () => {
             const rootChain = JSON.parse(body);
             console.log('Replace chain on a sync with', rootChain);
             blockchain.replaceChain(rootChain);
+            
         }
     })
 };
@@ -53,8 +51,10 @@ let PEER_PORT;
 if (process.env.GENERATE_PEER_PORT === 'true') {
     PEER_PORT = DEFAULT_PORT + Math.ceil(Math.random() * 1000);
 }
-const PORT = PEER_PORT || process.env.PORT || DEFAULT_PORT;
+const PORT = PEER_PORT || DEFAULT_PORT;
 app.listen(PORT, () => {
     console.log(`Listening at ${HOSTNAME}:${PORT}...`)
-    syncChain();
+    if(PORT !== DEFAULT_PORT){
+        syncChain();
+    }
 });
