@@ -2,7 +2,7 @@ const express = require('express');
 const request = require('request');
 const bodyParser = require('body-parser');
 const Blockchain = require('./blockchain');
-const PubSub = require('./pubsub');
+const PubSub = require('./app/pubsub');
 
 const app = express();
 const DEFAULT_PORT = 3000;
@@ -41,7 +41,7 @@ const syncChain = () => {
             const rootChain = JSON.parse(body);
             console.log('Replace chain on a sync with', rootChain);
             blockchain.replaceChain(rootChain);
-            
+
         }
     })
 };
@@ -54,7 +54,7 @@ if (process.env.GENERATE_PEER_PORT === 'true') {
 const PORT = PEER_PORT || DEFAULT_PORT;
 app.listen(PORT, () => {
     console.log(`Listening at ${HOSTNAME}:${PORT}...`)
-    if(PORT !== DEFAULT_PORT){
+    if (PORT !== DEFAULT_PORT) {
         syncChain();
     }
 });
