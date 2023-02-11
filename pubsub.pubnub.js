@@ -32,7 +32,7 @@ class PubSub {
         this.pubnub.publish({channel, message});
     }
 }
+
+// Testing 
 const testPubSub = new PubSub();
 testPubSub.publish({channel: CHANNELS.TEST, message: "hello pubnub"});
-
-module.exports = PubSub;
