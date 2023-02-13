@@ -3,6 +3,9 @@ const request = require('request');
 const bodyParser = require('body-parser');
 const Blockchain = require('./blockchain');
 const PubSub = require('./app/pubsub');
+const TransactionPool = require('./wallet/transaction-pool');
+const Wallet = require('./wallet');
+const Transaction = require('./wallet/transaction');
 
 const app = express();
 const DEFAULT_PORT = 3000;
@@ -10,6 +13,8 @@ const HOSTNAME = process.env.HOSTNAME || 'localhost';
 
 // initialize the blockchain
 const blockchain = new Blockchain();
+const transactionPool = new TransactionPool();
+const wallet = new Wallet();
 // setup pubsub and broadcast chain
 const pubsub = new PubSub({ blockchain });
 
@@ -34,6 +39,30 @@ app.post('/api/mine', (req, res) => {
     pubsub.broadcastChain();
     res.redirect('/api/blocks');
 });
+app.post('/api/transact', (req, res) => {
+    const { amount, recipient } = req.body;
+    let transaction = transactionPool.existingTransaction({inputAddress: wallet.publicKey})
+    try {
+        if(transaction){
+            transaction.update({senderWallet: wallet, recipient, wallet});
+        } else {
+            transaction = wallet.createTransaction({ amount, recipient });
+        }
+    } catch (error) {
+        return res.status(400).json({ type: 'error', message: error })
+    }
+    transactionPool.setTransaction(transaction);
+    console.log('transaction pool', transactionPool);
+    res.json({
+        type: 'success',
+        transaction
+    });
+})
+app.get('/api/transaction-pool-map', (req, res) => {
+    res.json(transactionPool.transactionMap);
+})
+
+
 
 const syncChain = () => {
     request({ url: `${ROOT_NODE_ADDRESS}/api/blocks` }, (error, response, body) => {
