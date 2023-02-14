@@ -6,7 +6,7 @@ const PubSub = require('./app/pubsub');
 const TransactionPool = require('./wallet/transaction-pool');
 const Wallet = require('./wallet');
 const Transaction = require('./wallet/transaction');
-const { response } = require('express');
+
 
 const app = express();
 const DEFAULT_PORT = 3000;
@@ -17,7 +17,8 @@ const blockchain = new Blockchain();
 const transactionPool = new TransactionPool();
 const wallet = new Wallet();
 // setup pubsub and broadcast chain
-const pubsub = new PubSub({ blockchain, transactionPool, wallet });
+const pubsub = new PubSub({ blockchain, transactionPool });
+// const pubsub = new PubSub({ blockchain, transactionPool, wallet }); // for PubNub
 
 const ROOT_NODE_ADDRESS = `http://${HOSTNAME}:${DEFAULT_PORT}`;
 
